@@ -25,7 +25,7 @@ public sealed class PublishToolTask : AsyncFrostingTask<BuildContext>
             };
         }
 
-            var copyToDir = $"artifacts-{rid}";
+        var copyToDir = $"artifacts-{rid}";
         try
         {
             if (context.BuildSystem().IsRunningOnGitHubActions)
@@ -48,6 +48,7 @@ public sealed class PublishToolTask : AsyncFrostingTask<BuildContext>
         {
             context.Information(" ");
             context.Information("++++++++++++++++++++++++++++++++++++++++++++++++++");
+            context.Information($"await context.BuildSystem().GitHubActions.Commands.UploadArtifact(DirectoryPath.FromString({context.ArtifactsDir}), {copyToDir});");
             context.Information($"CopyTo: {copyToDir}");
             context.Information("Exception");
             context.Information(ex.Message);
