@@ -26,47 +26,19 @@ public sealed class PublishToolTask : AsyncFrostingTask<BuildContext>
         }
 
         var copyToDir = $"artifacts-{rid}";
-        try
+        if (context.BuildSystem().IsRunningOnGitHubActions)
         {
-            if (context.BuildSystem().IsRunningOnGitHubActions)
-            {
-
-                // await context.BuildSystem().GitHubActions.Commands.UploadArtifact(DirectoryPath.FromString(context.ArtifactsDir), copyToDir);
-                await context.BuildSystem().GitHubActions.Commands.UploadArtifact(context.MakeAbsolute(new DirectoryPath(context.ArtifactsDir)), copyToDir);
-            }
-            else
-            {
-                // When running locally, make the artifacts directory mimic what github would look like
-                var files = Directory.GetFiles(context.ArtifactsDir);
-                context.CreateDirectory(new DirectoryPath($"{context.ArtifactsDir}/{copyToDir}"));
-                foreach (var file in files)
-                {
-                    context.MoveFileToDirectory(file, new DirectoryPath($"{context.ArtifactsDir}/{copyToDir}"));
-                }
-            }
+            await context.BuildSystem().GitHubActions.Commands.UploadArtifact(DirectoryPath.FromString(context.ArtifactsDir), copyToDir);
         }
-        catch (Exception ex)
+        else
         {
-            context.Information(" ");
-            context.Information("++++++++++++++++++++++++++++++++++++++++++++++++++");
-            context.Information($"await context.BuildSystem().GitHubActions.Commands.UploadArtifact(DirectoryPath.FromString({context.ArtifactsDir}), {copyToDir});");
-            context.Information($"CopyTo: {copyToDir}");
-            context.Information("Exception");
-            context.Information(ex.Message);
-            if (ex.InnerException is not null)
+            // When running locally, make the artifacts directory mimic what github would look like
+            var files = Directory.GetFiles(context.ArtifactsDir);
+            context.CreateDirectory(new DirectoryPath($"{context.ArtifactsDir}/{copyToDir}"));
+            foreach (var file in files)
             {
-                context.Information(" ");
-                context.Information("Inner Exception");
-                context.Information(ex.InnerException.Message);
-                context.Information(" ");
+                context.MoveFileToDirectory(file, new DirectoryPath($"{context.ArtifactsDir}/{copyToDir}"));
             }
-            context.Information(" ");
-            context.Information(ex.StackTrace);
-            context.Information("++++++++++++++++++++++++++++++++++++++++++++++++++");
-            context.Information(" ");
-#pragma warning disable CA2200 // Rethrow to preserve stack details
-            throw ex;
-#pragma warning restore CA2200 // Rethrow to preserve stack details
         }
     }
 }
