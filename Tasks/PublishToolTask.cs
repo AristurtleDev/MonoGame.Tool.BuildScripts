@@ -28,7 +28,7 @@ public sealed class PublishToolTask : AsyncFrostingTask<BuildContext>
         var copyToDir = $"artifacts-{rid}";
         if (context.BuildSystem().IsRunningOnGitHubActions)
         {
-            await context.BuildSystem().GitHubActions.Commands.UploadArtifact(DirectoryPath.FromString(context.ArtifactsDir), copyToDir);
+            await context.BuildSystem().GitHubActions.Commands.UploadArtifact(new DirectoryPath(context.ArtifactsDir), copyToDir);
         }
         else
         {
