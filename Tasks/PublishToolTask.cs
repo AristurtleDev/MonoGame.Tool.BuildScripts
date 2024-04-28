@@ -62,6 +62,9 @@ public sealed class PublishToolTask : AsyncFrostingTask<BuildContext>
             context.Information(ex.StackTrace);
             context.Information("++++++++++++++++++++++++++++++++++++++++++++++++++");
             context.Information(" ");
+#pragma warning disable CA2200 // Rethrow to preserve stack details
+            throw ex;
+#pragma warning restore CA2200 // Rethrow to preserve stack details
         }
     }
 }
